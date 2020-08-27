@@ -48,7 +48,8 @@ app.get("/compose", function(req, res) {
 app.post("/compose", function(req, res) {
   const post = {
     title: req.body.postTitle,
-    content: req.body.postContent
+    content: req.body.postContent,
+    postURL: _.kebabCase(req.body.postTitle.toLowerCase())
   };
 
   posts.push(post);
@@ -58,19 +59,15 @@ app.post("/compose", function(req, res) {
 
 
 app.get("/posts/:blogpost", function(req, res) {
-  const requestedTitle = _.kebabCase(req.params.blogpost.toLowerCase());
   posts.forEach(function(post) {
     const postTitle = _.kebabCase(post.title.toLowerCase());
-    if (postTitle === requestedTitle) {
+    if (postTitle === post.postURL) {
       res.render("post", {
         myPost: post
       });
     };
   });
 });
-
-
-
 
 
 app.listen(3000, function() {
