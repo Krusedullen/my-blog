@@ -4,62 +4,40 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const _ = require("lodash");
-const MongoClient = require("mongodb").MongoClient;
-const assert = require("assert");
-
-//connection url
-const mongoURL = "mongodb://localhost:27017";
-
-// database name
-const dbName = "blogDB";
-
-//Create a new MongoClient
-const client = new MongoClient(mongoURL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true}
-);
+const mongoose = require("mongoose");
 
 const app = express();
 
-const posts = [];
+
 
 const homeStartingContent = "Hello and welcome to my blog. This is a little blog about me and some of the things that are happening in my life.";
 const aboutContent = "My name is Therese and I live in bergen Norway. I am currently taking a course in full-stack web development where I am learning about how to build web-apps. The creative proccess is fun and it is motivating to see my skill levels increase with each project. In the near future I hope to start building my own project with the React-framework. Maybe I will tell You about it in my blog? 😉";
 const contactContent = "You can contact me on email: ";
 
-//connects to the database. client has access to the mongoDB url as a global const
-client.connect(function(err){
-  assert.equal(err, null);
-  const db = client.db(dbName);
-  // console.log("succsessfully connected to the database");
 
-  insertPosts(db, function(){
-    client.close();
-  });
+//connection to mongodb url with our database name at the end of the url
+mongoose.connect("mongodb://localhost:27017/blogDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true}
+);
+
+const postSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+  url: String,
+  date: Date
 });
 
-const insertPosts = function(db, callback){
-  const collection = db.collection("posts");
+const Post = mongoose.model("Post", postSchema);
 
-  collection.insertMany([
-    {
-      _id: "01",
-      title: "My second blogpost",
-      content: "This is my second blog entry, i hope i can successfully add it to my blog.",
-      url: "my-second-blogpost"
-    },
-    {
-      _id: "02",
-      title: "My third blogpost",
-      content: "This is my third blog entry, i hope i can successfully add it to my blog.",
-      url: "my-third-blogpost"
-    }
-  ], function(err, result){
-    assert.equal(err, null);
-    console.log("posts inserted");
-  });
-};
+const blogPosts = [];
 
+
+// Post.find(function(err, posts){
+//   if (err){console.log(err);
+//   }
+//   else {return posts};
+// });
 
 app.set('view engine', 'ejs');
 
@@ -71,7 +49,7 @@ app.use(express.static("public"));
 app.get("/", function(req, res) {
   res.render("home", {
     homeParagraph: homeStartingContent,
-    myPosts: posts
+    myPosts: blogPosts
   });
 
 });
@@ -94,13 +72,14 @@ app.get("/compose", function(req, res) {
 
 
 app.post("/compose", function(req, res) {
-  const post = {
+  const post = new Post({
     title: req.body.postTitle,
     content: req.body.postContent,
-    postURL: _.kebabCase(req.body.postTitle.toLowerCase())
-  };
-  //pushes your new post in to the posts-array
-  posts.push(post);
+    url: _.kebabCase(req.body.postTitle.toLowerCase()),
+    date: new Date()
+  });
+  //saves your post to the database
+  post.save();
 
   res.redirect("/");
 });
