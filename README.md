@@ -8,5 +8,6 @@ The posts were originally stored in an array, and existsed only for the duration
 * HTML5
 * CSS3
 * JavaScript
-* ejs 3.1.5
 * Bootstrap 4
+* MongoDB
+* Mongoose
