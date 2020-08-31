@@ -11,3 +11,5 @@ The posts were originally stored in an array, and existsed only for the duration
 * Bootstrap 4
 * MongoDB
 * Mongoose
+* ejs 3.1.5
+
