@@ -7,6 +7,7 @@ const _ = require("lodash");
 const mongoose = require("mongoose");
 
 const app = express();
+const home = "Home";
 
 
 
@@ -16,28 +17,25 @@ const contactContent = "You can contact me on email: ";
 
 
 //connection to mongodb url with our database name at the end of the url
-mongoose.connect("mongodb://localhost:27017/blogDB", {
+// Local connection: "mongodb://localhost:27017/blogDB"
+mongoose.connect("mongodb+srv://admin-therese:lykketroll@cluster0.ruahq.mongodb.net/blogDB?retryWrites=true&w=majority", {
   useNewUrlParser: true,
-  useUnifiedTopology: true}
-);
+  useUnifiedTopology: true
+});
 
 const postSchema = new mongoose.Schema({
-  title: String,
-  content: String,
+  //attributes can be specified as a key:value-pair, or another jSON-object can be passed with more specified options.
+  title: {
+    type: String,
+    required: [true, "no title was specified for this post."]
+  },
   url: String,
+  content: String,
   date: Date
 });
 
 const Post = mongoose.model("Post", postSchema);
 
-const blogPosts = [];
-
-
-// Post.find(function(err, posts){
-//   if (err){console.log(err);
-//   }
-//   else {return posts};
-// });
 
 app.set('view engine', 'ejs');
 
@@ -46,13 +44,19 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
-app.get("/", function(req, res) {
-  res.render("home", {
-    homeParagraph: homeStartingContent,
-    myPosts: blogPosts
-  });
 
+
+app.get("/", function(req, res) {
+  Post.find({}, function(err, post) {
+    if (!err) {
+      res.render("home", {
+        homeParagraph: homeStartingContent,
+        myPosts: post
+      });
+    };
+  });
 });
+
 
 app.get("/contact", function(req, res) {
   res.render("contact", {
@@ -72,31 +76,39 @@ app.get("/compose", function(req, res) {
 
 
 app.post("/compose", function(req, res) {
-  const post = new Post({
-    title: req.body.postTitle,
+  postTitle = _.capitalize(req.body.postTitle);
+  const newPost = new Post({
+    title: postTitle,
     content: req.body.postContent,
-    url: _.kebabCase(req.body.postTitle.toLowerCase()),
-    date: new Date()
+    date: new Date(),
+    url: _.kebabCase(postTitle)
   });
-  //saves your post to the database
-  post.save();
 
+  newPost.save();
   res.redirect("/");
 });
 
 
 app.get("/posts/:blogpost", function(req, res) {
-  posts.forEach(function(post) {
-    const postTitle = _.kebabCase(post.title.toLowerCase());
-    if (postTitle === post.postURL) {
+  const postUrl = req.params.blogpost;
+
+  Post.findOne({
+    url: postUrl
+  }, function(err, foundPost) {
+      if (!err) {
       res.render("post", {
-        myPost: post
+        title: foundPost.title,
+        content: foundPost.content
       });
-    };
+    } else{
+      console.log("oops, couldn't load this post");
+    }
   });
 });
 
 
-app.listen(3000, function() {
+
+
+app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3000");
 });
