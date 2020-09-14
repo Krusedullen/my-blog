@@ -1,0 +1,15 @@
+<%- include("partials/header") -%>
+
+<h1 class="h1">Editor</h1>
+
+<%myPosts.forEach(function(post){%>
+  <form class="" action="/delete" method="post">
+    <div class="form-group">
+      <h2><%=post.title%></h2>
+      <p><%=post.content.substring(0,100) + " ..."%> <button type="submit" name="deleteBtn" value= <%=post._id %>>Delete</button></p>
+    </div>
+  </form>
+<%});%>
+
+
+<%- include("partials/footer") -%>

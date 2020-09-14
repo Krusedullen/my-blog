@@ -88,6 +88,27 @@ app.post("/compose", function(req, res) {
   res.redirect("/");
 });
 
+app.get("/editor", function(req, res){
+  Post.find({}, function(err, post) {
+    if (!err) {
+      res.render("editor", {
+        myPosts: post
+      });
+    };
+  });
+});
+
+app.post("/delete", function(req, res){
+  const postID = req.body.deleteBtn;
+  Post.deleteOne({
+    _id: postID
+  }, function(err){
+    if(!err){
+      res.redirect("/editor");
+    };
+  });
+});
+
 
 app.get("/posts/:blogpost", function(req, res) {
   const postUrl = req.params.blogpost;
