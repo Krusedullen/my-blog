@@ -70,12 +70,14 @@ app.get("/about", function(req, res) {
   });
 });
 
-app.get("/compose", function(req, res) {
+
+app.route("/compose")
+
+.get(function(req, res) {
   res.render("compose");
-});
+})
 
-
-app.post("/compose", function(req, res) {
+.post(function(req, res) {
   postTitle = _.capitalize(req.body.postTitle);
   const newPost = new Post({
     title: postTitle,
