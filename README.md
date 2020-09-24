@@ -1,6 +1,6 @@
 # My Blog
 This is a challenge from the London App Brewery. Here I am making a web-app that allows the author of the blog to add posts to a blog-site. 
-The posts were originally stored in an array, and existsed only for the duration of the session. In a new udate, the posts are now stored in a MongoDB database, but the feature to read and render them on my blog has yet to be implemented.
+The posts were originally stored in an array, and existsed only for the duration of the session. In a new udate, the posts are now stored in a MongoDB database.
 
 ## Technologies
 * node.js v12.18.3
