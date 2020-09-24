@@ -1,5 +1,5 @@
 //jshint esversion:6
-
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -18,7 +18,7 @@ const contactContent = "You can contact me on email: ";
 
 //connection to mongodb url with our database name at the end of the url
 // Local connection: "mongodb://localhost:27017/blogDB"
-mongoose.connect("mongodb+srv://admin-therese:lykketroll@cluster0.ruahq.mongodb.net/blogDB?retryWrites=true&w=majority", {
+mongoose.connect(process.env.MONGODB_KEY, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
